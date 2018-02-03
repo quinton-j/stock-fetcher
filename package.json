@@ -1,0 +1,17 @@
+{
+  "name": "stock-fetcher",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Q",
+  "license": "MIT",
+  "dependencies": {
+    "json2csv": "^3.11.5",
+    "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
+    "request-promise-lite": "^0.12.0"
+  }
+}
