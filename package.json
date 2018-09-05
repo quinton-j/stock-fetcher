@@ -9,6 +9,8 @@
   "author": "Q",
   "license": "MIT",
   "dependencies": {
+    "alphavantage": "^1.1.1",
+    "cheerio": "^1.0.0-rc.2",
     "json2csv": "^3.11.5",
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",

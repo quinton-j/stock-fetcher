@@ -1,3 +1,6 @@
+// https://iextrading.com/developer/docs/#stocks
+// doesn't support TSX :(
+
 const _ = require('lodash');
 const request = require('request-promise-lite');
 
@@ -22,12 +25,12 @@ exports.default = function fetchStocks(stocks) {
     }
 };
 
-const googleUrl = 'https://finance.google.com/finance?output=json&q=';
+const iexUrl = 'api.iextrading.com/1.0/stock/market/batch?types=quote&symbols=';
 function getStock(stock) {
     if (!stock) {
         return Promise.reject('Empty stock name was passed.');
     } else {
-        return request.get(googleUrl + stock, {
+        return request.get(iexUrl + stock, {
             json: false,
             resolveWithFullResponse: true,
         }).then(response => parseStock(response.body.toString()));

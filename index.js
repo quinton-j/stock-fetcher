@@ -3,43 +3,28 @@ const _ = require('lodash');
 const json2csv = require('json2csv');
 const fs = require('fs');
 
-const googleStocks = require('./google-stocks').default;
+//const fetchStocks = require('./google-stocks').fetchStocks;
+//const fetchStocks = require('./iex-stocks').fetchStocks;
+// const fetchStocks = require('./alpha-vantage-stocks').fetchStocks;
+const fetchStocks = require('./yahoo-stock-scrapper').fetchStocks;
 
 const parsedArgs = minimist(process.argv.slice(2));
 const symbols = (parsedArgs['symbols'] || '').split(',');
 const outFile = parsedArgs['out-file'];
 
-console.info(`Fetching for symbols:`, symbols);
-googleStocks(symbols).then(results => {
-    const remappedValues = _.map(results, mapResult);
-    if (outFile) {
-        recordsToCsvFile(remappedValues, outFile);
-    } else {
-        console.info(JSON.stringify(remappedValues, null, 4));
-    }
-}).catch(console.error);
+(async () => await run(symbols, outFile))();
 
-function mapResult(result) {
-    if (result.l) { // stock
-        return {
-            symbol: result.symbol,
-            exhcange: result.exchange,
-            close: result.l,
-            high52: result.hi52,
-            low52: result.lo52,
-            div: result.ldiv,
-            yield: result.dy,
-        };
-    } else if (result.nav_prior) { //mutual fund
-        return {
-            symbol: result.t,
-            exhcange: result.e,
-            close: result.nav_prior,
-            yield: result.yield_percent,
-            expenseRatio: result.expense_ratio,
-        };
-    } else { //unknown
-        return {};
+async function run(symbols, outFile) {
+    console.info(`Fetching for symbols:`, symbols);
+    try {
+        const stocks = await fetchStocks(symbols);
+        if (outFile) {
+            recordsToCsvFile(stocks, outFile);
+        } else {
+            console.info(JSON.stringify(stocks, null, 4));
+        }
+    } catch (error) {
+        console.error(error.toString())
     }
 }
 
