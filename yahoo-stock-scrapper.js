@@ -9,14 +9,7 @@ module.exports = {
 
         if (!stocks || !stocks.length) {
             return [];
-        } else {
-            const results = [];
-            for (const stock of stocks) {
-                console.info(`Fetching stock ${stock} [${results.length + 1}/${stocks.length}]`);
-                const result = await getStock(stock);
-                results.push(result);
-            }
-            return results;
+            return Promise.all(stocks.map(getStock));
         }
     },
 }
@@ -26,6 +19,7 @@ async function getStock(stock) {
     if (!stock) {
         throw new Error('Empty stock name was passed.');
     } else {
+        console.info(`Fetching stock ${stock}....`);
         const response = await request.get(baseUrl + stock, {
             json: false,
             resolveWithFullResponse: true,
@@ -39,6 +33,7 @@ function parseStock(stock, body) {
     const $ = cheerio.load(body);
     const current = parseFloat($('span[data-reactid="35"]').text());
     const range52Weeks = $('td[data-test="FIFTY_TWO_WK_RANGE-value"]').text().split('-');
+    const peRatio = $('span', 'td[data-test="PE_RATIO-value"]').text().trim();
     let dividend, stockYield;
     let dividendAndYield = $('td[data-test="DIVIDEND_AND_YIELD-value"]').text().trim();
     if(dividendAndYield === "") {
@@ -58,5 +53,6 @@ function parseStock(stock, body) {
         low52: parseFloat(range52Weeks[0].trim()),
         div: dividend,
         yield: stockYield,
+        peRatio: parseFloat(peRatio),
     };
 }

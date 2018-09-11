@@ -31,7 +31,7 @@ async function run(symbols, outFile) {
 function recordsToCsvFile(results, outFile) {
     json2csv({
         data: results,
-        fields: ['symbol', 'close', 'high52', 'low52', 'div', 'yield'],
+        fields: ['symbol', 'close', 'high52', 'low52', 'div', 'yield', 'peRatio'],
     }, (error, csvString) => {
         if (error) {
             console.error('Failed to convert records to csv:', error);
