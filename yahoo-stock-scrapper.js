@@ -9,6 +9,7 @@ module.exports = {
 
         if (!stocks || !stocks.length) {
             return [];
+        } else {
             return Promise.all(stocks.map(getStock));
         }
     },
