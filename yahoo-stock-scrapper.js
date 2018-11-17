@@ -10,7 +10,7 @@ module.exports = {
         if (!stocks || !stocks.length) {
             return [];
         } else {
-            return Promise.all(stocks.map(getStock));
+            return Promise.all(stocks.sort().map(getStock));
         }
     },
 }
