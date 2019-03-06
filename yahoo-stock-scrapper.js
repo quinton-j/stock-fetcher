@@ -25,35 +25,28 @@ async function getStock(stock) {
             json: false,
             resolveWithFullResponse: true,
         });
-        return parseStock(stock, response.body.toString());
+        return parseStockJson(stock, response.body.toString());
     }
 }
 
-function parseStock(stock, body) {
+function parseStockJson(stock, body) {
     const splitSymbol = stock.split('.');
-    const $ = cheerio.load(body);
-    const current = parseFloat($('span[data-reactid="35"]').text());
-    const range52Weeks = $('td[data-test="FIFTY_TWO_WK_RANGE-value"]').text().split('-');
-    const peRatio = $('span', 'td[data-test="PE_RATIO-value"]').text().trim();
-    let dividend, stockYield;
-    let dividendAndYield = $('td[data-test="DIVIDEND_AND_YIELD-value"]').text().trim();
-    if(dividendAndYield === "") {
-        const yieldString = $('span', 'td[data-test="TD_YIELD-value"]').text().replace('%', '').trim();
-        stockYield = parseFloat(yieldString)/100.0;
-        dividend = current * stockYield;
-    } else {
-        const splits = dividendAndYield.split('(');
-        dividend = parseFloat(splits[0].trim());
-        stockYield = parseFloat(splits[1].split('%')[0])/100.0;
-    }
+    const data = /^root\.App\.main = (.*);$/gm.exec(body);
+    const json = JSON.parse(data[1]);
+    const stockData = json.context.dispatcher.stores.QuoteSummaryStore;
+    const summaryDetail = stockData.summaryDetail;
+
+    const current = stockData.price.regularMarketPrice.raw;
+    const stockYield = summaryDetail.yield.raw;
+
     return {
         symbol: splitSymbol[0],
         exchange: splitSymbol[1],
         close: current,
-        high52: parseFloat(range52Weeks[1].trim()),
-        low52: parseFloat(range52Weeks[0].trim()),
-        div: dividend,
-        yield: stockYield,
-        peRatio: parseFloat(peRatio),
+        high52: summaryDetail.fiftyTwoWeekHigh.raw,
+        low52: summaryDetail.fiftyTwoWeekLow.raw,
+        div: stockYield ? stockYield * current : summaryDetail.dividendRate.raw,
+        yield: stockYield ? stockYield : summaryDetail.dividendYield.raw,
+        peRatio: !summaryDetail.trailingPE ? null : summaryDetail.trailingPE.raw,
     };
 }
