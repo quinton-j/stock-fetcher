@@ -1,7 +1,5 @@
 
-const _ = require('lodash');
 const request = require('request-promise-lite');
-const cheerio = require('cheerio');
 
 module.exports = {
     fetchStocks: async function (stocks) {
@@ -37,16 +35,16 @@ function parseStockJson(stock, body) {
     const summaryDetail = stockData.summaryDetail;
 
     const current = stockData.price.regularMarketPrice.raw;
-    const stockYield = summaryDetail.yield.raw;
+    const stockYield = summaryDetail.yield && summaryDetail.yield.raw;
 
     return {
         symbol: splitSymbol[0],
         exchange: splitSymbol[1],
         close: current,
-        high52: summaryDetail.fiftyTwoWeekHigh.raw,
-        low52: summaryDetail.fiftyTwoWeekLow.raw,
-        div: stockYield ? stockYield * current : summaryDetail.dividendRate.raw,
-        yield: stockYield ? stockYield : summaryDetail.dividendYield.raw,
+        high52: summaryDetail.fiftyTwoWeekHigh && summaryDetail.fiftyTwoWeekHigh.raw,
+        low52: summaryDetail.fiftyTwoWeekLow &&  summaryDetail.fiftyTwoWeekLow.raw,
+        div: stockYield ? stockYield * current : (summaryDetail.dividendRate && summaryDetail.dividendRate.raw),
+        yield: stockYield ? stockYield : (summaryDetail.dividendYield && summaryDetail.dividendYield.raw),
         peRatio: !summaryDetail.trailingPE ? null : summaryDetail.trailingPE.raw,
     };
 }

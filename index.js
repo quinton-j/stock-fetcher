@@ -1,5 +1,4 @@
 const minimist = require('minimist');
-const _ = require('lodash');
 const json2csv = require('json2csv').parse;
 const fs = require('fs');
 
