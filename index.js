@@ -5,7 +5,7 @@ const fs = require('fs');
 const fetchStocks = require('./yahoo-stock-scrapper').fetchStocks;
 
 const parsedArgs = minimist(process.argv.slice(2));
-const symbols = (parsedArgs['symbols'] || '').split(',');
+const symbols = (parsedArgs['symbols'] || '').split(',').filter(symbol => symbol !== '');
 const outFile = parsedArgs['out-file'];
 
 (async () => await run(symbols, outFile))();
